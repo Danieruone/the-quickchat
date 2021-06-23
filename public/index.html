@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="container">
+        <h1 style="font-weight: 100;">The QuickChat</h1>
+        <div class="chat-messages" id="chat">
+            <p style="color: gray; width: 100%; display: flex; justify-content: center; margin-top: 50px;">No messages
+                yet</p>
+        </div>
+        <form class="chat-container" id="form">
+            <input id="text" autocomplete="off" type="text" placeholder="Type your message here...">
+            <button type="submit">Send</button>
+        </form>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"
+        integrity="sha512-iZIBSs+gDyTH0ZhUem9eQ1t4DcEn2B9lHxfRMeGQhyNdSUz+rb+5A3ummX6DQTOIs1XK0gOteOg/LPtSo9VJ+w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        const randomColor = Math.floor(Math.random() * 16777215).toString(16);
+        // form inputs
+        const text = document.querySelector('#text');
+        const form = document.querySelector('#form');
+        const chat = document.querySelector('#chat');
+
+        // messages
+        const arrayMessages = [];
+        const socket = io('http://localhost:8080');
+
+        // listeners
+        socket.on('welcome-message', ({ message }) => {
+            console.log(message);
+        })
+
+        socket.on('client-message', (data) => {
+            arrayMessages.push(data);
+            chat.innerHTML = "";
+            arrayMessages.map((messageObj) => {
+                chat.innerHTML += `<p style="color: #${messageObj.color}; font-weight: 600;">${messageObj.message}</p>`
+            })
+            chat.scrollTop = chat.scrollHeight;
+        })
+
+        // emiter
+        const sendMessage = () => {
+            const message = text.value
+            if (text.value !== "") {
+                socket.emit('client-message', {
+                    message: message,
+                    color: randomColor,
+                    date: new Date()
+                })
+                text.value = "";
+            }
+        }
+
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            sendMessage();
+        })
+
+    </script>
+</body>
+
+</html>
