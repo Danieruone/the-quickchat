@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
-    <title>Document</title>
+    <title>The QuickChat</title>
 </head>
 
 <body>
@@ -33,7 +33,9 @@
 
         // messages
         const arrayMessages = [];
-        const socket = io('http://localhost:8080');
+
+        const currentLocation = window.location;
+        const socket = io(`${currentLocation}`);
 
         // listeners
         socket.on('welcome-message', ({ message }) => {
